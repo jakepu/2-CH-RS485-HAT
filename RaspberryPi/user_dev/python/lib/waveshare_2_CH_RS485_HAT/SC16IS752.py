@@ -6,6 +6,8 @@ import logging
 
 import os
 import sys
+import ctypes
+from ctypes import c_int32
 libdir = os.path.dirname(os.path.realpath(__file__))
 if os.path.exists(libdir):
     sys.path.append(libdir)
@@ -77,6 +79,16 @@ def REG(_Value):
      return _Value<<3
 
 com = config.config()
+
+# Refer to Line Control Register bits description from NXP's datasheet
+class LCR(ctypes.Structure): 
+    _fields_ = [('word_len_config', c_int32, 2),
+                ('num_stop_config', c_int32, 1),
+                ('parity_en', c_int32, 1),
+                ('parity_type', c_int32, 1),
+                ('set_parity', c_int32, 1),
+                ('break_ctrl', c_int32, 1), 
+                ('latch_enable', c_int32, 1),] # divisor latch enable
 
 class SC16IS752(object):
     CHANNEL_2   = 0x02
@@ -164,6 +176,39 @@ class SC16IS752(object):
     
     def UART_ReadByte(self):
         return self.UART_Read(1)[0]
+    
+    def set_line_control_register(self, Baud, break_ctrl, set_parity, parity_type,
+                                  parity_en, num_stop_config, word_len_config):
+        if(Baud == 921600 or Baud == 460800 or Baud == 230400 or Baud == 128000 or 
+        Baud == 115200 or Baud == 57600 or Baud == 56000 or Baud == 38400 or Baud == 19200 or 
+        Baud == 14400  or Baud == 9600  or Baud == 4800  or Baud == 2400  or Baud == 1200  or 
+        Baud == 600    or Baud == 300 ):
+            Baud = Baud
+        else :
+            logging.debug("The baud rate parameter is incorrect and has been modified to 115200")
+            Baud = 115200
+        
+        Baud_t = int(XTAL1/PRESCALER/16/Baud) 
+        Reg_IER = self.WR_REG(CMD_READ|REG(IER)|self.Channel, 0xff) 
+
+        
+        self.WR_REG(CMD_WRITE|REG(IER)|self.Channel, 0x10) #nter sleep mode
+        self.WR_REG(CMD_WRITE|REG(LCR)|self.Channel, 0x80) #Special register
+
+        self.WR_REG(CMD_WRITE|REG(DLH)|self.Channel, int(Baud_t/256)) #Frequency divider H
+        self.WR_REG(CMD_WRITE|REG(DLL)|self.Channel, int(Baud_t%256)) #Frequency divider L
+        self.WR_REG(CMD_WRITE|REG(DLL)|self.Channel, int(Baud_t%256)) #Frequency divider L
+
+        Reg_LCR = LCR()
+        Reg_LCR.latch_enable = 0 #Exit Special register
+        Reg_LCR.break_ctrl = break_ctrl
+        Reg_LCR.set_parity = set_parity
+        Reg_LCR.parity_type = parity_type
+        Reg_LCR.parity_en = parity_en
+        Reg_LCR.num_stop_config = num_stop_config
+        Reg_LCR.word_len_config = word_len_config
+        self.WR_REG(CMD_WRITE|REG(LCR)|self.Channel, int.from_bytes(Reg_LCR, byteorder=sys.byteorder)) 
+        self.WR_REG(CMD_WRITE|REG(IER)|self.Channel, int(Reg_IER[0])) #Exit sleep mode
 
     
     

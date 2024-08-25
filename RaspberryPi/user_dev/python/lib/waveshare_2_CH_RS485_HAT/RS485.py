@@ -18,12 +18,25 @@ class RS485(object):
         self.SC16IS752_CH1.Set_Baudrate(Baud)
         GPIO.output(self.config.TXDEN_1, GPIO.HIGH)  
         print ('SC16IS752_CH1')
+    
+    def RS485_CH1_begin(self, Baud, break_ctrl, set_parity, parity_type,
+                                  parity_en, num_stop_config, word_len_config):
+        self.SC16IS752_CH1 = SC16IS752.SC16IS752(1)#CH1
+        self.SC16IS752_CH1.set_line_control_register(Baud)
+        GPIO.output(self.config.TXDEN_1, GPIO.HIGH)  
+        print ('SC16IS752_CH1')
         
     def RS485_CH2_begin(self, Baud):
         self.SC16IS752_CH2 = SC16IS752.SC16IS752(2)#CH2
         self.SC16IS752_CH2.Set_Baudrate(Baud)
         GPIO.output(self.config.TXDEN_2, GPIO.HIGH)  
-        
+
+    def RS485_CH2_begin(self, Baud, break_ctrl, set_parity, parity_type,
+                                  parity_en, num_stop_config, word_len_config):
+        self.SC16IS752_CH2 = SC16IS752.SC16IS752(2)#CH2
+        self.SC16IS752_CH2.set_line_control_register(Baud)
+        GPIO.output(self.config.TXDEN_2, GPIO.HIGH)  
+
     def RS485_CH1_ReadByte(self):
         GPIO.output(self.config.TXDEN_1, GPIO.HIGH)   
         return self.SC16IS752_CH1.UART_ReadByte()
