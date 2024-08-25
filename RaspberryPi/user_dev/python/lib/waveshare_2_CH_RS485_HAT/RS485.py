@@ -2,12 +2,9 @@ import RPi.GPIO as GPIO
 import time
 import os
 import sys
-libdir = os.path.dirname(os.path.realpath(__file__))
-if os.path.exists(libdir):
-    sys.path.append(libdir)
 
-import config
-import SC16IS752
+from . import config
+from . import SC16IS752
 
 class RS485(object):
     def __init__(self):

@@ -8,11 +8,8 @@ import os
 import sys
 import ctypes
 from ctypes import c_int32
-libdir = os.path.dirname(os.path.realpath(__file__))
-if os.path.exists(libdir):
-    sys.path.append(libdir)
 
-import config
+from . import config
 
 XTAL1       = 14745600 #14.7456M
 PRESCALER   = 1
