@@ -16,10 +16,13 @@ class RS485(object):
         GPIO.output(self.config.TXDEN_1, GPIO.HIGH)  
         print ('SC16IS752_CH1')
     
-    def RS485_CH1_begin(self, Baud, break_ctrl, set_parity, parity_type,
-                                  parity_en, num_stop_config, word_len_config):
+    def RS485_CH1_begin(self, Baud, num_stop_config, word_len_config, 
+                        break_ctrl=0, set_parity=0, parity_type=0, parity_en=0):
         self.SC16IS752_CH1 = SC16IS752.SC16IS752(1)#CH1
-        self.SC16IS752_CH1.set_line_control_register(Baud)
+        self.SC16IS752_CH1.set_line_control_register(Baud=Baud, num_stop_config=num_stop_config,
+                                                     word_len_config=word_len_config, 
+                                                     break_ctrl=break_ctrl, set_parity=set_parity,
+                                                     parity_type=parity_type, parity_en=parity_en)
         GPIO.output(self.config.TXDEN_1, GPIO.HIGH)  
         print ('SC16IS752_CH1')
         
@@ -28,10 +31,13 @@ class RS485(object):
         self.SC16IS752_CH2.Set_Baudrate(Baud)
         GPIO.output(self.config.TXDEN_2, GPIO.HIGH)  
 
-    def RS485_CH2_begin(self, Baud, break_ctrl, set_parity, parity_type,
-                                  parity_en, num_stop_config, word_len_config):
+    def RS485_CH2_begin(self, Baud, num_stop_config, word_len_config, 
+                        break_ctrl=0, set_parity=0, parity_type=0, parity_en=0):
         self.SC16IS752_CH2 = SC16IS752.SC16IS752(2)#CH2
-        self.SC16IS752_CH2.set_line_control_register(Baud)
+        self.SC16IS752_CH2.set_line_control_register(Baud=Baud, num_stop_config=num_stop_config,
+                                                     word_len_config=word_len_config, 
+                                                     break_ctrl=break_ctrl, set_parity=set_parity,
+                                                     parity_type=parity_type, parity_en=parity_en)
         GPIO.output(self.config.TXDEN_2, GPIO.HIGH)  
 
     def RS485_CH1_ReadByte(self):
